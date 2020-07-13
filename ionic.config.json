@@ -1,7 +1,8 @@
 {
-  "name": "Kve.SO QR",
+  "name": "Kve.So QR",
   "integrations": {
-    "capacitor": {}
+    "capacitor": {},
+    "cordova": {}
   },
   "type": "angular"
 }

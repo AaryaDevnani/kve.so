@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Kve.So QR</string>
+    <string name="title_activity_main">Kve.So QR</string>
+    <string name="package_name">com.nwdco.kve.so.qr</string>
+    <string name="custom_url_scheme">com.nwdco.kve.so.qr</string>
+</resources>

@@ -1,20 +1,56 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
-  </ion-toolbar>
+<ion-header>
+  <!-- toolbar 
+    <ion-toolbar color="primary">
+    <ion-button
+      (click)="scanCode()"
+      fill="outline"
+      color="light"
+      id="btn-enter"
+      size="default"
+      ><ion-icon name="chevron-back-outline" slot="start"></ion-icon
+      >back</ion-button
+    >
+  </ion-toolbar>-->
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="background" id="background">
+  <ion-card class="card">
+    <ion-card-header class="heading">Result: </ion-card-header>
+    <ion-card-content>
+      <ion-item lines="none">
+        <div
+          lines="none"
+          *ngIf="scannedCode"
+          [innerHtml]="htmlVariable"
+          class="result"
+        ></div>
+      </ion-item>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+      <ion-button
+        (click)="scanCode()"
+        fill="outline"
+        id="btn-enter"
+        size="large"
+        class="btn-scan"
+        ><ion-icon name="qr-code-outline" slot="start"></ion-icon>New
+        Scan</ion-button
+      >
+      <ion-item lines="none"></ion-item>
+
+      <p class="text">
+        Use Kve.so QR scanner to scan all types of QR Codes - Complex as well as
+        Dynamic QR codes.
+      </p>
+    </ion-card-content>
+  </ion-card>
 </ion-content>
+
+<ion-footer class="ion-no-border footer">
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <a href="https://kve.so/nw">NWDCo Innovation.</a>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-footer>

@@ -1,3 +1,51 @@
+ion-content {
+  --background: none;
+  background-image: url("../../assets/images/background3.jpg");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  text-align: center;
+}
+@media only screen and (max-height: 850px) {
+  .card {
+    transform: translateX(0) translateY(0%);
+    top: 20%;
+    left: 0%;
+    position: fixed;
+  }
+  .text {
+    font-size: 20px;
+  }
+  .result {
+    transform: translateX(0%) translateY(0%);
+    top: 5%;
+    font-size: 22px;
+
+    margin: 0 auto;
+    text-align: center;
+    display: block;
+    width: 100%;
+    height: 225px;
+    overflow: scroll;
+
+    /* These are technically the same, but use both */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+
+    -ms-word-break: break-all;
+    /* This is the dangerous one in WebKit, as it breaks things wherever */
+    word-break: break-all;
+    /* Instead use this non-standard one: */
+    word-break: break-word;
+
+    /* Adds a hyphen where the word breaks, if supported (No Blink) */
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+  }
+}
+
 #container {
   text-align: center;
 
@@ -24,4 +72,152 @@
 
 #container a {
   text-decoration: none;
+}
+
+@media only screen and (min-height: 850px) {
+  .card {
+    transform: translateX(0) translateY(-50%);
+    top: 35%;
+    left: 0%;
+    position: fixed;
+    color: white;
+  }
+  .text {
+    font-size: 20px;
+    transform: translateX(0%) translateY(0%);
+    top: 0%;
+    left: 0%;
+  }
+  .result {
+    transform: translateX(0%) translateY(0%);
+    top: 5%;
+    font-size: 20px;
+    margin: 0 auto;
+    text-align: center;
+    display: block;
+    width: 100%;
+    height: 300px;
+    overflow: scroll;
+
+    /* These are technically the same, but use both */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+
+    -ms-word-break: break-all;
+    /* This is the dangerous one in WebKit, as it breaks things wherever */
+    word-break: break-all;
+    /* Instead use this non-standard one: */
+    word-break: break-word;
+
+    /* Adds a hyphen where the word breaks, if supported (No Blink) */
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+  }
+}
+
+.footer {
+  transform: translateX(-50%) translateY(-75%);
+  top: 100%;
+  left: 80%;
+  position: fixed;
+}
+
+ion-card {
+  box-shadow: none !important;
+}
+.heading {
+  font-size: 22px;
+}
+// for big devices
+
+@media only screen and (min-height: 1000px) and (min-width: 700px) {
+  .card {
+    transform: translateX(0) translateY(0%);
+    top: 30%;
+    left: 0%;
+  }
+  .text {
+    font-size: 20px;
+  }
+  .result {
+    transform: translateX(0%) translateY(0%);
+    top: 5%;
+    font-size: 22px;
+
+    margin: 0 auto;
+    text-align: center;
+    display: block;
+    width: 100%;
+    height: 350px;
+    overflow: scroll;
+
+    /* These are technically the same, but use both */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+
+    -ms-word-break: break-all;
+    /* This is the dangerous one in WebKit, as it breaks things wherever */
+    word-break: break-all;
+    /* Instead use this non-standard one: */
+    word-break: break-word;
+
+    /* Adds a hyphen where the word breaks, if supported (No Blink) */
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+  }
+  .footer {
+    transform: translateX(-50%) translateY(-75%);
+    top: 100%;
+    left: 90%;
+    position: fixed;
+  }
+}
+
+@media only screen and (min-height: 1000px) and (min-width: 1000px) {
+  .card {
+    transform: translateX(0) translateY(0%);
+    top: 30%;
+    left: 4%;
+  }
+  .text {
+    font-size: 20px;
+  }
+  .result {
+    transform: translateX(0%) translateY(0%);
+    top: 5%;
+    font-size: 22px;
+
+    margin: 0 auto;
+    text-align: center;
+    display: block;
+    width: 100%;
+    height: 350px;
+    overflow: scroll;
+
+    /* These are technically the same, but use both */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+
+    -ms-word-break: break-all;
+    /* This is the dangerous one in WebKit, as it breaks things wherever */
+    word-break: break-all;
+    /* Instead use this non-standard one: */
+    word-break: break-word;
+
+    /* Adds a hyphen where the word breaks, if supported (No Blink) */
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+  }
+  .footer {
+    transform: translateX(-50%) translateY(-75%);
+    top: 100%;
+    left: 90%;
+    position: fixed;
+  }
 }
