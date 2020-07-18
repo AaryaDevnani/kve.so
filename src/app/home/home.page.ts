@@ -3,6 +3,13 @@ import { BarcodeScanner } from "@ionic-native/barcode-scanner/ngx";
 import { CallNumber } from "@ionic-native/call-number/ngx";
 import { SMS } from "@ionic-native/sms/ngx";
 import { WifiWizard2 } from "@ionic-native/wifi-wizard-2/ngx";
+import { Calendar } from "@ionic-native/calendar/ngx";
+import {
+  Contacts,
+  Contact,
+  ContactField,
+  ContactName,
+} from "@ionic-native/contacts/ngx";
 
 @Component({
   selector: "app-home",
@@ -28,12 +35,85 @@ export class HomePage {
   eventArr: any = "";
   eventName: any = "";
   eventDesc: any = "";
+  eventLoc: any = "";
+  eventStartArr: any = "";
+  eventEndArr: any = "";
+  eventSDate: any = "";
+  eventEDate: any = "";
+  eventSTime: any = "";
+  eventETime: any = "";
+  eventSY: any = "";
+  eventSM: any = "";
+  eventSD: any = "";
+  eventEY: any = "";
+  eventEM: any = "";
+  eventED: any = "";
+  eventSH: any = "";
+  eventSMin: any = "";
+  eventSS: any = "";
+  eventEH: any = "";
+  eventEMin: any = "";
+  eventES: any = "";
+  eventStart: any = "";
+  eventEnd: any = "";
+  VCD: any = "";
+  fullName: string = "";
+  adr: string = "";
+  tel: string = "";
+  name: string = "";
+
   constructor(
     private barcodeScanner: BarcodeScanner,
     private callNumber: CallNumber,
     private sms: SMS,
-    private wifiWizard: WifiWizard2
+    private wifiWizard: WifiWizard2,
+    private calendar: Calendar,
+    private contacts: Contacts
   ) {}
+
+  private parse_vcard(input: string) {
+    var Re1 = /^(version|fn|title|org):(.+)$/i;
+    var Re2 = /^([^:;]+);([^:]+):(.+)$/;
+    var ReKey = /item\d{1,2}\./;
+    var fields = {};
+
+    input.split(/\r\n|\r|\n/).forEach(function (line) {
+      var results, key;
+
+      if (Re1.test(line)) {
+        results = line.match(Re1);
+        key = results[1].toLowerCase();
+        fields[key] = results[2];
+      } else if (Re2.test(line)) {
+        results = line.match(Re2);
+        key = results[1].replace(ReKey, "").toLowerCase();
+
+        var meta = {};
+        results[2]
+          .split(";")
+          .map(function (p, i) {
+            var match = p.match(/([a-z]+)=(.*)/i);
+            if (match) {
+              return [match[1], match[2]];
+            } else {
+              return ["TYPE" + (i === 0 ? "" : i), p];
+            }
+          })
+          .forEach(function (p) {
+            meta[p[0]] = p[1];
+          });
+
+        if (!fields[key]) fields[key] = [];
+
+        fields[key].push({
+          meta: meta,
+          value: results[3].split(";"),
+        });
+      }
+    });
+
+    return fields;
+  }
 
   scanCode() {
     this.barcodeScanner.scan().then((barcodeData) => {
@@ -46,9 +126,36 @@ export class HomePage {
   }
 
   checkForURL(str2) {
-    if (str2.includes("http")) {
+    if (str2.includes("BEGIN:VCARD")) {
+      this.VCD = this.parse_vcard(this.scannedCode);
+      this.fullName = this.VCD.fn;
+      this.tel = this.VCD.tel[0].value;
+      this.email = this.VCD.email[0].value;
+      this.adr = this.VCD.adr[0].value;
+
       this.htmlVariable =
-        "<a href='" + this.scannedCode + "'>" + this.scannedCode + "</a>";
+        "<div>" +
+        this.fullName +
+        "</div>" +
+        "<div>" +
+        this.email +
+        "</div>" +
+        "<div>" +
+        this.tel +
+        "</div>" +
+        this.adr + //JSON.stringify(this.VCD) +
+        "</div>";
+      //this.htmlVariable = "<div>" + this.scannedCode + "</div>";
+      let contact: Contact = this.contacts.create();
+      contact.name = new ContactName(null, this.fullName);
+      contact.phoneNumbers = [
+        new ContactField("mobile", this.tel.toString(), true),
+      ];
+      contact.emails = [new ContactField("home", this.email.toString(), true)];
+      contact.save().then(
+        () => alert("Contact saved!"),
+        (error: any) => console.error("Error saving contact.", error)
+      );
     } else if (str2.includes("tel:")) {
       //phone no.
       this.phone = this.scannedCode.slice(4);
@@ -107,6 +214,41 @@ export class HomePage {
       this.eventArr = this.scannedCode.trim().split(":");
       this.eventName = this.eventArr[2].slice(0, -12);
       this.eventDesc = this.eventArr[3].slice(0, -9);
+      this.eventLoc = this.eventArr[4].slice(0, -8);
+      this.eventStartArr = this.eventArr[5].slice(0, -7);
+      this.eventEndArr = this.eventArr[6].slice(0, -5);
+      this.eventSDate = this.eventStartArr.trim().split("T")[0];
+      this.eventEDate = this.eventEndArr.trim().split("T")[0];
+      this.eventSTime = this.eventStartArr.trim().split("T")[1];
+      this.eventETime = this.eventEndArr.trim().split("T")[1];
+      this.eventSY = this.eventSDate.slice(0, -4);
+      this.eventSM = this.eventSDate.slice(4, 6) - 1;
+      this.eventSD = this.eventSDate.slice(6);
+      this.eventEY = this.eventEDate.slice(0, -4);
+      this.eventEM = this.eventEDate.slice(4, 6) - 1;
+      this.eventED = this.eventEDate.slice(6);
+      this.eventSH = this.eventSTime.slice(0, -4);
+      this.eventSMin = this.eventSTime.slice(2, 4);
+      this.eventSS = this.eventSTime.slice(4);
+      this.eventEH = this.eventETime.slice(0, -4);
+      this.eventEMin = this.eventETime.slice(2, 4);
+      this.eventES = this.eventETime.slice(4);
+      this.eventStart = new Date(
+        this.eventSY,
+        this.eventSM,
+        this.eventSD,
+        this.eventSH,
+        this.eventSMin,
+        this.eventSS
+      ); // beware: month 0 = january, 11 = december
+      this.eventEnd = new Date(
+        this.eventEY,
+        this.eventEM,
+        this.eventED,
+        this.eventEH,
+        this.eventEMin,
+        this.eventES
+      );
 
       this.htmlVariable =
         "<div>" +
@@ -114,7 +256,31 @@ export class HomePage {
         "</div>" +
         "<div>" +
         this.eventDesc +
+        "</div>" +
+        "<div>" +
+        this.eventLoc +
+        "</div>" +
+        "<div>" +
+        this.eventStart +
+        "  To  " +
+        this.eventEnd +
         "</div>";
+
+      this.calendar
+        .createEvent(
+          this.eventName,
+          this.eventLoc,
+          this.eventDesc,
+          this.eventStart,
+          this.eventEnd
+        )
+        .then(
+          () => alert("Event saved!"),
+          (error: any) => console.error("Error saving event.", error)
+        );
+    } else if (str2.includes("http") || str2.includes("www")) {
+      this.htmlVariable =
+        "<a href='" + this.scannedCode + "'>" + this.scannedCode + "</a>";
     } else {
       this.htmlVariable = "<div>" + this.scannedCode + "</div>";
     }

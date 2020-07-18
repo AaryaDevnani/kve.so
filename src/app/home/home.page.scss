@@ -130,8 +130,7 @@ ion-card {
 .heading {
   font-size: 22px;
 }
-// for big devices
-
+//css for big screens
 @media only screen and (min-height: 1000px) and (min-width: 700px) {
   .card {
     transform: translateX(0) translateY(0%);

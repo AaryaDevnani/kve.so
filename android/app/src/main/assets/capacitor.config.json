@@ -1,5 +1,5 @@
 {
-  "appId": "io.ionic.starter",
+  "appId": "com.nwdco.kve.so.qr",
   "appName": "Kve.So QR",
   "bundledWebRuntime": false,
   "npmClient": "npm",

@@ -12,8 +12,9 @@ import { AppRoutingModule } from "./app-routing.module";
 import { BarcodeScanner } from "@ionic-native/barcode-scanner/ngx";
 import { CallNumber } from "@ionic-native/call-number/ngx";
 import { SMS } from "@ionic-native/sms/ngx";
-//import { Hotspot } from "@ionic-native/hotspot/ngx";
 import { WifiWizard2 } from "@ionic-native/wifi-wizard-2/ngx";
+import { Calendar } from "@ionic-native/calendar/ngx";
+import { Contacts } from "@ionic-native/contacts/ngx";
 
 @NgModule({
   declarations: [AppComponent],
@@ -22,11 +23,14 @@ import { WifiWizard2 } from "@ionic-native/wifi-wizard-2/ngx";
   providers: [
     StatusBar,
     SplashScreen,
+
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     BarcodeScanner,
     CallNumber,
     SMS,
     WifiWizard2,
+    Calendar,
+    Contacts,
   ],
   bootstrap: [AppComponent],
 })
