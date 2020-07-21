@@ -61,7 +61,8 @@ export class HomePage {
   adr: string = "";
   tel: string = "";
   name: string = "";
-
+  vCardDetected: boolean = false;
+  vEventDetected: boolean = false;
   constructor(
     private barcodeScanner: BarcodeScanner,
     private callNumber: CallNumber,
@@ -124,49 +125,106 @@ export class HomePage {
   ngAfterViewInit() {
     this.scanCode();
   }
+  addContact() {
+    let contact: Contact = this.contacts.create();
+    contact.name = new ContactName(null, this.fullName);
+    contact.phoneNumbers = [
+      new ContactField("mobile", this.tel.toString(), true),
+    ];
+    contact.emails = [new ContactField("home", this.email.toString(), true)];
+    contact.save().then(
+      () => alert("Contact saved!"),
+      (error: any) => alert("Error saving contact.")
+    );
+  }
+  addToCal() {
+    this.vEventDetected = true;
+    this.eventArr = this.scannedCode.trim().split(":");
+    this.eventName = this.eventArr[2].slice(0, -12);
+    this.eventDesc = this.eventArr[3].slice(0, -9);
+    this.eventLoc = this.eventArr[4].slice(0, -8);
+    this.eventStartArr = this.eventArr[5].slice(0, -7);
+    this.eventEndArr = this.eventArr[6].slice(0, -5);
+    this.eventSDate = this.eventStartArr.trim().split("T")[0];
+    this.eventEDate = this.eventEndArr.trim().split("T")[0];
+    this.eventSTime = this.eventStartArr.trim().split("T")[1];
+    this.eventETime = this.eventEndArr.trim().split("T")[1];
+    this.eventSY = this.eventSDate.slice(0, -4);
+    this.eventSM = this.eventSDate.slice(4, 6) - 1;
+    this.eventSD = this.eventSDate.slice(6);
+    this.eventEY = this.eventEDate.slice(0, -4);
+    this.eventEM = this.eventEDate.slice(4, 6) - 1;
+    this.eventED = this.eventEDate.slice(6);
+    this.eventSH = this.eventSTime.slice(0, -4);
+    this.eventSMin = this.eventSTime.slice(2, 4);
+    this.eventSS = this.eventSTime.slice(4);
+    this.eventEH = this.eventETime.slice(0, -4);
+    this.eventEMin = this.eventETime.slice(2, 4);
+    this.eventES = this.eventETime.slice(4);
+    this.eventStart = new Date(
+      this.eventSY,
+      this.eventSM,
+      this.eventSD,
+      this.eventSH,
+      this.eventSMin,
+      this.eventSS
+    ); // beware: month 0 = january, 11 = december
+    this.eventEnd = new Date(
+      this.eventEY,
+      this.eventEM,
+      this.eventED,
+      this.eventEH,
+      this.eventEMin,
+      this.eventES
+    );
+
+    this.calendar
+      .createEvent(
+        this.eventName,
+        this.eventLoc,
+        this.eventDesc,
+        this.eventStart,
+        this.eventEnd
+      )
+      .then(
+        () => alert("Event saved!"),
+        (error: any) => console.error("Error saving event.", error)
+      );
+  }
 
   checkForURL(str2) {
     if (str2.includes("BEGIN:VCARD")) {
+      this.vCardDetected = true;
+      this.vEventDetected = false;
       this.VCD = this.parse_vcard(this.scannedCode);
-      this.fullName = this.VCD.fn;
-      this.tel = this.VCD.tel[0].value;
-      this.email = this.VCD.email[0].value;
-      this.adr = this.VCD.adr[0].value;
-
-      this.htmlVariable =
-        "<div>" +
-        this.fullName +
-        "</div>" +
-        "<div>" +
+      //this.fullName = this.VCD.fn;
+      //this.tel = this.VCD.tel[0].value;
+      ///this.email = this.VCD.email[0].value;
+      //this.adr = this.VCD.adr;
+      this.htmlVariable = "<div>" + JSON.stringify(this.VCD) + "</div>";
+      /* "<div>" +
         this.email +
         "</div>" +
         "<div>" +
         this.tel +
-        "</div>" +
-        this.adr + //JSON.stringify(this.VCD) +
-        "</div>";
+        "</div>" + */
+
       //this.htmlVariable = "<div>" + this.scannedCode + "</div>";
-      let contact: Contact = this.contacts.create();
-      contact.name = new ContactName(null, this.fullName);
-      contact.phoneNumbers = [
-        new ContactField("mobile", this.tel.toString(), true),
-      ];
-      contact.emails = [new ContactField("home", this.email.toString(), true)];
-      contact.save().then(
-        () => alert("Contact saved!"),
-        (error: any) => console.error("Error saving contact.", error)
-      );
     } else if (str2.includes("tel:")) {
       //phone no.
+      this.vCardDetected = false;
+      this.vEventDetected = false;
       this.phone = this.scannedCode.slice(4);
 
       this.htmlVariable =
-        "<a href=tel:'" + this.phone + "'>" + this.phone + "</a>";
+        "<a href=tel:" + this.phone + ">" + this.phone + "</a>";
       /* this.htmlVariable = "<div>" + this.phone + "</div>"
             this.callNumber.callNumber(this.phone, false);
          */
     } else if (str2.includes("SMSTO:") || str2.includes("smsto")) {
       //message
+      this.vCardDetected = false;
+      this.vEventDetected = false;
       this.mphone = this.scannedCode.slice(6, 16);
       this.message = this.scannedCode.slice(17);
       var options = { android: { intent: "INTENT" } };
@@ -175,6 +233,8 @@ export class HomePage {
         "<a>" + this.mphone + "</a>" + "<div>" + this.message + "</div>";
       this.sms.send(this.mphone, this.message, options);
     } else if (str2.includes("WIFI")) {
+      this.vEventDetected = false;
+      this.vCardDetected = false;
       //wifi
       this.wifiArr = this.scannedCode.trim().split(";");
       this.ssid = this.wifiArr[1];
@@ -190,6 +250,8 @@ export class HomePage {
         this.algorithm.slice(7)
       );
     } else if (str2.includes("mailto:")) {
+      this.vCardDetected = false;
+      this.vEventDetected = false;
       //email
       this.emailArr = this.scannedCode.trim().split("?");
       this.mailTo = this.emailArr[0];
@@ -211,6 +273,8 @@ export class HomePage {
         this.emailBody +
         "</div>";
     } else if (str2.includes("VEVENT")) {
+      this.vCardDetected = false;
+      this.vEventDetected = true;
       this.eventArr = this.scannedCode.trim().split(":");
       this.eventName = this.eventArr[2].slice(0, -12);
       this.eventDesc = this.eventArr[3].slice(0, -9);
@@ -265,23 +329,14 @@ export class HomePage {
         "  To  " +
         this.eventEnd +
         "</div>";
-
-      this.calendar
-        .createEvent(
-          this.eventName,
-          this.eventLoc,
-          this.eventDesc,
-          this.eventStart,
-          this.eventEnd
-        )
-        .then(
-          () => alert("Event saved!"),
-          (error: any) => console.error("Error saving event.", error)
-        );
     } else if (str2.includes("http") || str2.includes("www")) {
+      this.vCardDetected = false;
+      this.vEventDetected = false;
       this.htmlVariable =
         "<a href='" + this.scannedCode + "'>" + this.scannedCode + "</a>";
     } else {
+      this.vCardDetected = false;
+      this.vEventDetected = false;
       this.htmlVariable = "<div>" + this.scannedCode + "</div>";
     }
   }

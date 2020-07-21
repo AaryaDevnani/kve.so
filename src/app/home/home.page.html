@@ -27,6 +27,25 @@
       </ion-item>
 
       <ion-button
+        (click)="addToCal()"
+        fill="outline"
+        id="btn-enter"
+        size="large"
+        *ngIf="this.vEventDetected == true"
+        ><ion-icon name="calendar-outline" slot="start"></ion-icon>Add To
+        Calendar</ion-button
+      >
+      <ion-button
+        (click)="addContact()"
+        fill="outline"
+        id="btn-enter"
+        size="large"
+        *ngIf="this.vCardDetected == true"
+        ><ion-icon name="person-add-outline" slot="start"></ion-icon>Add
+        Contact</ion-button
+      >
+
+      <ion-button
         (click)="scanCode()"
         fill="outline"
         id="btn-enter"
