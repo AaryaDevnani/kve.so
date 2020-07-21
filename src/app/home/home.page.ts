@@ -57,6 +57,7 @@ export class HomePage {
   eventStart: any = "";
   eventEnd: any = "";
   VCD: any = "";
+  ver: any = "";
   fullName: string = "";
   adr: string = "";
   tel: string = "";
@@ -73,7 +74,7 @@ export class HomePage {
   ) {}
 
   private parse_vcard(input: string) {
-    var Re1 = /^(version|fn|title|org):(.+)$/i;
+    var Re1 = /^(version|fn|n|tel|title|organization|adr):(.+)$/i;
     var Re2 = /^([^:;]+);([^:]+):(.+)$/;
     var ReKey = /item\d{1,2}\./;
     var fields = {};
@@ -126,16 +127,42 @@ export class HomePage {
     this.scanCode();
   }
   addContact() {
-    let contact: Contact = this.contacts.create();
-    contact.name = new ContactName(null, this.fullName);
-    contact.phoneNumbers = [
-      new ContactField("mobile", this.tel.toString(), true),
-    ];
-    contact.emails = [new ContactField("home", this.email.toString(), true)];
-    contact.save().then(
-      () => alert("Contact saved!"),
-      (error: any) => alert("Error saving contact.")
-    );
+    this.VCD = this.parse_vcard(this.scannedCode);
+    this.ver = this.VCD.version;
+
+    if (this.ver >= 2 && this.ver < 3) {
+      this.fullName = this.VCD.fn;
+      this.email = this.VCD.email[0].value;
+      this.adr = this.VCD.adr;
+      this.tel = this.VCD.tel[0].value;
+      let contact: Contact = this.contacts.create();
+      contact.name = new ContactName(null, this.fullName);
+      contact.phoneNumbers = [
+        new ContactField("mobile", this.tel.toString(), true),
+      ];
+      contact.emails = [new ContactField("home", this.email.toString(), true)];
+      contact.addresses = [new ContactField("home", this.adr.toString(), true)];
+      contact.save().then(
+        () => alert("Contact saved!"),
+        (error: any) => alert("Error saving contact.")
+      );
+    } else if (this.ver >= 3) {
+      this.fullName = this.VCD.n.slice(0, -1);
+      this.email = this.VCD.email[0].value;
+      this.adr = this.VCD.adr;
+      this.tel = this.VCD.tel;
+      let contact: Contact = this.contacts.create();
+      contact.name = new ContactName(null, this.fullName);
+      contact.phoneNumbers = [
+        new ContactField("mobile", this.tel.toString(), true),
+      ];
+      contact.emails = [new ContactField("home", this.email.toString(), true)];
+      contact.addresses = [new ContactField("home", this.adr.toString(), true)];
+      contact.save().then(
+        () => alert("Contact saved!"),
+        (error: any) => alert("Error saving contact.")
+      );
+    }
   }
   addToCal() {
     this.vEventDetected = true;
@@ -194,22 +221,47 @@ export class HomePage {
 
   checkForURL(str2) {
     if (str2.includes("BEGIN:VCARD")) {
+      this.VCD = this.parse_vcard(this.scannedCode);
+
+      this.email = this.VCD.email[0].value;
+      this.adr = this.VCD.adr;
       this.vCardDetected = true;
       this.vEventDetected = false;
-      this.VCD = this.parse_vcard(this.scannedCode);
-      //this.fullName = this.VCD.fn;
-      //this.tel = this.VCD.tel[0].value;
-      ///this.email = this.VCD.email[0].value;
-      //this.adr = this.VCD.adr;
-      this.htmlVariable = "<div>" + JSON.stringify(this.VCD) + "</div>";
-      /* "<div>" +
-        this.email +
-        "</div>" +
-        "<div>" +
-        this.tel +
-        "</div>" + */
+      if (str2.includes("VERSION:2")) {
+        this.fullName = this.VCD.fn;
+        this.tel = this.VCD.tel[0].value;
+        this.htmlVariable =
+          "<div>" +
+          this.fullName +
+          "</div>" +
+          "<div>" +
+          this.email +
+          "</div>" +
+          "<div>" +
+          this.tel +
+          "</div>" +
+          "<div>" +
+          this.adr +
+          "</div>";
+      } else if (str2.includes("VERSION:3")) {
+        this.fullName = this.VCD.n;
+        this.tel = this.VCD.tel;
+        this.htmlVariable =
+          "<div>" +
+          this.fullName +
+          "</div>" +
+          "<div>" +
+          this.email +
+          "</div>" +
+          "<div>" +
+          this.tel +
+          "</div>" +
+          "<div>" +
+          this.adr +
+          "</div>";
+      }
 
-      //this.htmlVariable = "<div>" + this.scannedCode + "</div>";
+      //this.htmlVariable = "<div>" + JSON.stringify(this.VCD) + "</div>";
     } else if (str2.includes("tel:")) {
       //phone no.
       this.vCardDetected = false;
@@ -220,13 +272,19 @@ export class HomePage {
         "<a href=tel:" + this.phone + ">" + this.phone + "</a>";
       /* this.htmlVariable = "<div>" + this.phone + "</div>"
             this.callNumber.callNumber(this.phone, false);
-         */
+    */
     } else if (str2.includes("SMSTO:") || str2.includes("smsto")) {
       //message
       this.vCardDetected = false;
       this.vEventDetected = false;
-      this.mphone = this.scannedCode.slice(6, 16);
-      this.message = this.scannedCode.slice(17);
+      if (str2.includes("smsto:+91") || str2.includes("SMSTO:+91")) {
+        this.mphone = this.scannedCode.slice(6, 19);
+        this.message = this.scannedCode.slice(20);
+      } else {
+        this.mphone = this.scannedCode.slice(6, 16);
+        this.message = this.scannedCode.slice(17);
+      }
+
       var options = { android: { intent: "INTENT" } };
 
       this.htmlVariable =
