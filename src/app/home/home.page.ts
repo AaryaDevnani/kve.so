@@ -58,6 +58,11 @@ export class HomePage {
   eventEnd: any = "";
   VCD: any = "";
   ver: any = "";
+  street: any = "";
+  city: any = "";
+  country: any = "";
+  state: any = "";
+  pincode: any = "";
   fullName: string = "";
   adr: string = "";
   tel: string = "";
@@ -129,11 +134,26 @@ export class HomePage {
   addContact() {
     this.VCD = this.parse_vcard(this.scannedCode);
     this.ver = this.VCD.version;
-
+    this.adr = this.VCD.adr.trim().split(";");
+    this.street = this.adr[2];
+    this.city = this.adr[3];
+    this.state = this.adr[4];
+    this.pincode = this.adr[5];
+    this.country = this.adr[6];
+    this.adr =
+      this.street +
+      "," +
+      this.city +
+      "," +
+      this.state +
+      "," +
+      this.pincode +
+      "," +
+      this.country;
     if (this.ver >= 2 && this.ver < 3) {
       this.fullName = this.VCD.fn;
       this.email = this.VCD.email[0].value;
-      this.adr = this.VCD.adr;
+
       this.tel = this.VCD.tel[0].value;
       let contact: Contact = this.contacts.create();
       contact.name = new ContactName(null, this.fullName);
@@ -147,9 +167,8 @@ export class HomePage {
         (error: any) => alert("Error saving contact.")
       );
     } else if (this.ver >= 3) {
-      this.fullName = this.VCD.n.slice(0, -1);
+      this.fullName = this.VCD.n;
       this.email = this.VCD.email[0].value;
-      this.adr = this.VCD.adr;
       this.tel = this.VCD.tel;
       let contact: Contact = this.contacts.create();
       contact.name = new ContactName(null, this.fullName);
@@ -224,7 +243,22 @@ export class HomePage {
       this.VCD = this.parse_vcard(this.scannedCode);
 
       this.email = this.VCD.email[0].value;
-      this.adr = this.VCD.adr;
+      this.adr = this.VCD.adr.trim().split(";");
+      this.street = this.adr[2];
+      this.city = this.adr[3];
+      this.state = this.adr[4];
+      this.pincode = this.adr[5];
+      this.country = this.adr[6];
+      this.adr =
+        this.street +
+        "," +
+        this.city +
+        "," +
+        this.state +
+        "," +
+        this.pincode +
+        "," +
+        this.country;
       this.vCardDetected = true;
       this.vEventDetected = false;
       if (str2.includes("VERSION:2")) {
