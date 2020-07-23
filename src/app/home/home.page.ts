@@ -67,6 +67,7 @@ export class HomePage {
   adr: string = "";
   tel: string = "";
   name: string = "";
+  contactAdr: object;
   vCardDetected: boolean = false;
   vEventDetected: boolean = false;
   constructor(
@@ -150,9 +151,16 @@ export class HomePage {
       this.pincode +
       "," +
       this.country;
+
     if (this.ver >= 2 && this.ver < 3) {
       this.fullName = this.VCD.fn;
       this.email = this.VCD.email[0].value;
+      var addresses = [];
+      addresses[0] = this.street;
+      addresses[1].locality = this.city;
+      addresses[2].region = this.state;
+      addresses[3].postalCode = this.pincode;
+      addresses[4].country = this.country;
 
       this.tel = this.VCD.tel[0].value;
       let contact: Contact = this.contacts.create();
@@ -161,7 +169,7 @@ export class HomePage {
         new ContactField("mobile", this.tel.toString(), true),
       ];
       contact.emails = [new ContactField("home", this.email.toString(), true)];
-      contact.addresses = [new ContactField("home", this.adr.toString(), true)];
+      contact.addresses = addresses;
       contact.save().then(
         () => alert("Contact saved!"),
         (error: any) => alert("Error saving contact.")
@@ -176,7 +184,7 @@ export class HomePage {
         new ContactField("mobile", this.tel.toString(), true),
       ];
       contact.emails = [new ContactField("home", this.email.toString(), true)];
-      contact.addresses = [new ContactField("home", this.adr.toString(), true)];
+      contact.addresses = addresses;
       contact.save().then(
         () => alert("Contact saved!"),
         (error: any) => alert("Error saving contact.")
